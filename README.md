@@ -19,6 +19,40 @@ This project establishes modular documentation rules (OVERVIEW/DETAILS) and rigo
 2. Copy templates from `docs/templates/` into new modules
 3. Follow the documentation and testing standards defined in `AGENTS.md` and `TESTING_GUIDE.md`
 
+## Usage
+
+Add this function to your shell profile (`~/.bashrc`, `~/.zshrc`) to download templates into a new project:
+
+```bash
+get-templates() {
+    mkdir -p docs/templates core/tests
+
+    echo "Downloading templates via SSH..."
+
+    git archive --remote=git@github.com:kleber-yokota/template-agents.git add-docs | tar -x docs/template
+
+    if [ -f "docs/template/ROOT_OVERVIEW.md" ]; then
+        cp docs/template/ROOT_OVERVIEW.md OVERVIEW.md
+        echo "OVERVIEW.md created in root."
+    fi
+
+    echo "Templates ready."
+}
+```
+
+Usage:
+
+```bash
+# In a new project directory
+get-templates
+```
+
+To use HTTPS instead of SSH, replace the remote URL with:
+
+```
+https://github.com/kleber-yokota/template-agents.git
+```
+
 ## Documentation
 
 | File | Purpose |
@@ -30,4 +64,4 @@ This project establishes modular documentation rules (OVERVIEW/DETAILS) and rigo
 
 ## License
 
-[Add license information]
+This project is licensed under the [Apache License 2.0](LICENSE).
