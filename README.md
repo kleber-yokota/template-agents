@@ -25,6 +25,7 @@ This project establishes modular documentation rules (OVERVIEW/DETAILS) and rigo
 |---|---|
 | `AGENTS.md` | Architectural standards and documentation rules |
 | `TESTING_GUIDE.md` | Testing protocols (pytest, hypothesis, mutmut, atheris) |
+| `REVIEW.md` | Code review guidelines and checklists |
 | `docs/templates/` | Starter templates for new modules |
 
 ## License
