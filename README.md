@@ -24,19 +24,46 @@ This project establishes modular documentation rules (OVERVIEW/DETAILS) and rigo
 Add this function to your shell profile (`~/.bashrc`, `~/.zshrc`) to download templates into a new project:
 
 ```bash
-get-templates() {
-    mkdir -p docs/templates core/tests
+get-agents() {
+  local user="kleber-yokota"
+  local repo="template-agents"
+  local branch="main"
+  
+  # Fetch file list from GitHub API with User-Agent to avoid 403/404 errors
+  local entries=$(curl -s -H "User-Agent: curl" "https://api.github.com/repos/$user/$repo/git/trees/$branch?recursive=1" | \
+                  grep '"path":' | \
+                  sed -E 's/.*"path": "([^"]+)".*/\1/')
 
-    echo "Downloading templates via SSH..."
+  if [ -z "$entries" ]; then
+    echo "Error: Could not retrieve file list from repository."
+    echo "Please check if the branch '$branch' exists or if the API rate limit was reached."
+    return 1
+  fi
 
-    git archive --remote=git@github.com:kleber-yokota/template-agents.git add-docs | tar -x docs/template
+  echo "Synchronizing files (skipping README and LICENSE)..."
 
-    if [ -f "docs/template/ROOT_OVERVIEW.md" ]; then
-        cp docs/template/ROOT_OVERVIEW.md OVERVIEW.md
-        echo "OVERVIEW.md created in root."
+  while read -r file; do
+    if [ -n "$file" ]; then
+      # Convert to lowercase for comparison
+      local low_file="${file,,}"
+      
+      # Skip README and LICENSE (any extension)
+      if [[ "$low_file" == "readme.md" || "$low_file" == "license" || "$low_file" == "license.md" || "$low_file" == "license.txt" ]]; then
+        continue
+      fi
+
+      # Download and create directories if they don't exist
+      curl -sfL "https://raw.githubusercontent.com/$user/$repo/$branch/$file" \
+           --create-dirs \
+           -o "$file"
+      
+      if [ $? -eq 0 ]; then
+        echo "Downloaded: $file"
+      fi
     fi
+  done <<< "$entries"
 
-    echo "Templates ready."
+  echo "Synchronization complete."
 }
 ```
 
